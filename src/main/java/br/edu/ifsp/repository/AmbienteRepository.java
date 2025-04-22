@@ -8,5 +8,7 @@ import br.edu.ifsp.domain.Ambiente;
 
 public interface AmbienteRepository extends JpaRepository<Ambiente, Long> {
     List<Ambiente> findByDisponivelTrue();
+    long countByDisponivelTrue();
+
 }
 
