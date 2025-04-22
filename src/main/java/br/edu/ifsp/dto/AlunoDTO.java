@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AlunoDTO {
-    @NotBlank
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
-    @NotBlank
+    @NotBlank(message = "Prontuário é obrigatório")
     private String prontuario;
 
-    @NotBlank
+    @NotBlank(message = "Curso é obrigatório")
     private String curso;
 }
