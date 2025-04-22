@@ -1,5 +1,6 @@
 package br.edu.ifsp.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +10,11 @@ import br.edu.ifsp.enums.StatusChave;
 
 public interface SolicitacaoChaveRepository extends JpaRepository<SolicitacaoChave, Long> {
     List<SolicitacaoChave> findByAlunoId(Long alunoId);
-    List<SolicitacaoChave> findByAmbienteId(Long ambienteId);
-    List<SolicitacaoChave> findByStatus(StatusChave status);
-}
 
+    List<SolicitacaoChave> findByAmbienteId(Long ambienteId);
+
+    List<SolicitacaoChave> findByStatus(StatusChave status);
+
+    List<SolicitacaoChave> findByDataSolicitacaoBetween(LocalDateTime inicio, LocalDateTime fim);
+
+}
