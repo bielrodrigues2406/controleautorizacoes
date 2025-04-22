@@ -54,5 +54,9 @@ public class AutorizacaoService {
     public void deletar(Long id) {
         repository.deleteById(id);
     }
+
+    public boolean alunoAutorizado(Long alunoId, Long ambienteId) {
+        return repository.existeAutorizacaoAtiva(alunoId, ambienteId);
+    }
 }
 

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -37,7 +38,8 @@ public class AutorizacaoController {
     @Operation(summary = "Cadastra uma nova autorização de uso")
     @ApiResponse(responseCode = "201", description = "Autorização criada com sucesso")
     @PostMapping
-    public ResponseEntity<AutorizacaoDTO> salvar(@RequestBody @Valid AutorizacaoDTO dto, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<AutorizacaoDTO> salvar(@RequestBody @Valid AutorizacaoDTO dto,
+            UriComponentsBuilder uriBuilder) {
         Autorizacao autorizacao = service.salvar(dto);
         URI uri = uriBuilder.path("/autorizacoes/{id}").buildAndExpand(autorizacao.getId()).toUri();
         return ResponseEntity.created(uri).body(mapper.autorizacaoToAutorizacaoDTO(autorizacao));
@@ -45,9 +47,8 @@ public class AutorizacaoController {
 
     @Operation(summary = "Lista autorizações de um aluno")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Autorizações do aluno encontradas",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
-        @ApiResponse(responseCode = "404", description = "Aluno não possui autorizações", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Autorizações do aluno encontradas", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Aluno não possui autorizações", content = @Content)
     })
     @GetMapping("/aluno/{id}")
     public ResponseEntity<List<AutorizacaoDTO>> listarPorAluno(@PathVariable Long id) {
@@ -57,9 +58,8 @@ public class AutorizacaoController {
 
     @Operation(summary = "Lista autorizações por ambiente")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Autorizações do ambiente encontradas",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
-        @ApiResponse(responseCode = "404", description = "Ambiente não possui autorizações", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Autorizações do ambiente encontradas", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Ambiente não possui autorizações", content = @Content)
     })
     @GetMapping("/ambiente/{id}")
     public ResponseEntity<List<AutorizacaoDTO>> listarPorAmbiente(@PathVariable Long id) {
@@ -73,5 +73,14 @@ public class AutorizacaoController {
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/aluno/{alunoId}/autorizado")
+    @PreAuthorize("hasAnyRole('CAE', 'SERVIDOR', 'ALUNO')")
+    public ResponseEntity<Boolean> verificarAutorizacaoAtiva(
+            @PathVariable Long alunoId,
+            @RequestParam Long ambienteId) {
+        boolean autorizado = service.alunoAutorizado(alunoId, ambienteId);
+        return ResponseEntity.ok(autorizado);
     }
 }
