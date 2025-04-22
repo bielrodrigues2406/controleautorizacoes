@@ -13,5 +13,8 @@ public class AlunoDTO {
     private String prontuario;
     private String curso;
     private String email;
-    private String usuarioUsername; // para buscar o login relacionado
+
+    // Dados de login
+    private String username;
+    private String password;
 }

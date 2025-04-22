@@ -1,6 +1,6 @@
 package br.edu.ifsp.domain;
 
-import javax.management.relation.Role;
+import br.edu.ifsp.enums.Role; // ✅ enum certo
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

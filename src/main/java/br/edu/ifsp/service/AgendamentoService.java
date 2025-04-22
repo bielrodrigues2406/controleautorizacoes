@@ -2,7 +2,6 @@ package br.edu.ifsp.service;
 
 import br.edu.ifsp.domain.Autorizacao;
 import br.edu.ifsp.repository.AutorizacaoRepository;
-import br.edu.ifsp.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
