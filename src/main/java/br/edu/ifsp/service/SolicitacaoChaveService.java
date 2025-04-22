@@ -13,6 +13,8 @@ import br.edu.ifsp.enums.StatusChave;
 import br.edu.ifsp.repository.AlunoRepository;
 import br.edu.ifsp.repository.AmbienteRepository;
 import br.edu.ifsp.repository.SolicitacaoChaveRepository;
+import br.edu.ifsp.service.audit.LogAcaoService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,6 +24,8 @@ public class SolicitacaoChaveService {
     private final SolicitacaoChaveRepository repository;
     private final AlunoRepository alunoRepository;
     private final AmbienteRepository ambienteRepository;
+    private final LogAcaoService logAcaoService;
+    private final HttpServletRequest request;
 
     public SolicitacaoChave solicitar(SolicitacaoChaveDTO dto) {
         Aluno aluno = alunoRepository.findById(dto.getAlunoId())
@@ -36,21 +40,42 @@ public class SolicitacaoChaveService {
         sc.setStatus(StatusChave.SOLICITADA);
         sc.setDataSolicitacao(LocalDateTime.now());
 
-        return repository.save(sc);
+        sc = repository.save(sc);
+
+        String usuario = request.getUserPrincipal().getName();
+        logAcaoService.registrar(usuario, "Solicitou chave", "SolicitacaoChave", sc.getId());
+
+        return sc;
     }
 
     public SolicitacaoChave entregar(Long id) {
-        SolicitacaoChave sc = repository.findById(id).orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
+        SolicitacaoChave sc = repository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
+
         sc.setStatus(StatusChave.ENTREGUE);
         sc.setDataEntrega(LocalDateTime.now());
-        return repository.save(sc);
+
+        sc = repository.save(sc);
+
+        String usuario = request.getUserPrincipal().getName();
+        logAcaoService.registrar(usuario, "Entregou chave", "SolicitacaoChave", sc.getId());
+
+        return sc;
     }
 
     public SolicitacaoChave devolver(Long id) {
-        SolicitacaoChave sc = repository.findById(id).orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
+        SolicitacaoChave sc = repository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
+
         sc.setStatus(StatusChave.DEVOLVIDA);
         sc.setDataDevolucao(LocalDateTime.now());
-        return repository.save(sc);
+
+        sc = repository.save(sc);
+
+        String usuario = request.getUserPrincipal().getName();
+        logAcaoService.registrar(usuario, "Devolveu chave", "SolicitacaoChave", sc.getId());
+
+        return sc;
     }
 
     public List<SolicitacaoChave> listar() {
