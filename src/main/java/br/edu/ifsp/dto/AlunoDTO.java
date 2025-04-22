@@ -9,15 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AlunoDTO {
-    @NotBlank(message = "Nome é obrigatório")
     private String nome;
-
-    @NotBlank(message = "Prontuário é obrigatório")
     private String prontuario;
-
-    @NotBlank(message = "Curso é obrigatório")
     private String curso;
-
-    @NotBlank(message = "email é obrigatório")
-    private String emaill;
+    private String email;
+    private String usuarioUsername; // para buscar o login relacionado
 }
