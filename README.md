@@ -1,6 +1,5 @@
 # controleautorizacoes
 Projeto 2 - Sistema de Controle de Autorizações para Utilização de Laboratórios e Salas do IFSP
-Grupo: Gabriel e Jorge
 
 O sistema proposto tem como principal objetivo controlar o empréstimo de chaves para acesso a salas do IFSP, onde um servidor da permissão que um determinado aluno utilize uma determinada sala, essa é autorização de utilização. 
 
