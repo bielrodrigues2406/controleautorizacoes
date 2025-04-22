@@ -12,10 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.hibernate.query.Page;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springdoc.core.converters.models.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +32,7 @@ public class AutorizacaoController {
 
     @Operation(summary = "Lista todas as autorizações cadastradas")
     @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
-    @GetMapping
+    @GetMapping("/todas")
     public ResponseEntity<List<AutorizacaoDTO>> listar() {
         List<Autorizacao> lista = service.listar();
         return ResponseEntity.ok(mapper.autorizacaoListToAutorizacaoDTOList(lista));
@@ -44,7 +42,7 @@ public class AutorizacaoController {
     @ApiResponse(responseCode = "201", description = "Autorização criada com sucesso")
     @PostMapping
     public ResponseEntity<AutorizacaoDTO> salvar(@RequestBody @Valid AutorizacaoDTO dto,
-            UriComponentsBuilder uriBuilder) {
+                                                 UriComponentsBuilder uriBuilder) {
         Autorizacao autorizacao = service.salvar(dto);
         URI uri = uriBuilder.path("/autorizacoes/{id}").buildAndExpand(autorizacao.getId()).toUri();
         return ResponseEntity.created(uri).body(mapper.autorizacaoToAutorizacaoDTO(autorizacao));
@@ -52,7 +50,8 @@ public class AutorizacaoController {
 
     @Operation(summary = "Lista autorizações de um aluno")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Autorizações do aluno encontradas", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
+            @ApiResponse(responseCode = "200", description = "Autorizações do aluno encontradas",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
             @ApiResponse(responseCode = "404", description = "Aluno não possui autorizações", content = @Content)
     })
     @GetMapping("/aluno/{id}")
@@ -63,13 +62,24 @@ public class AutorizacaoController {
 
     @Operation(summary = "Lista autorizações por ambiente")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Autorizações do ambiente encontradas", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
+            @ApiResponse(responseCode = "200", description = "Autorizações do ambiente encontradas",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
             @ApiResponse(responseCode = "404", description = "Ambiente não possui autorizações", content = @Content)
     })
     @GetMapping("/ambiente/{id}")
     public ResponseEntity<List<AutorizacaoDTO>> listarPorAmbiente(@PathVariable Long id) {
         List<Autorizacao> lista = service.listarPorAmbiente(id);
         return ResponseEntity.ok(mapper.autorizacaoListToAutorizacaoDTOList(lista));
+    }
+
+    @Operation(summary = "Verifica se um aluno está autorizado para um ambiente no momento atual")
+    @GetMapping("/aluno/{alunoId}/autorizado")
+    @PreAuthorize("hasAnyRole('CAE', 'SERVIDOR', 'ALUNO')")
+    public ResponseEntity<Boolean> verificarAutorizacaoAtiva(
+            @PathVariable Long alunoId,
+            @RequestParam Long ambienteId) {
+        boolean autorizado = service.alunoAutorizado(alunoId, ambienteId);
+        return ResponseEntity.ok(autorizado);
     }
 
     @Operation(summary = "Remove uma autorização por ID")
@@ -80,25 +90,16 @@ public class AutorizacaoController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/aluno/{alunoId}/autorizado")
-    @PreAuthorize("hasAnyRole('CAE', 'SERVIDOR', 'ALUNO')")
-    public ResponseEntity<Boolean> verificarAutorizacaoAtiva(
-            @PathVariable Long alunoId,
-            @RequestParam Long ambienteId) {
-        boolean autorizado = service.alunoAutorizado(alunoId, ambienteId);
-        return ResponseEntity.ok(autorizado);
-    }
-
+    @Operation(summary = "Filtra autorizações com suporte a paginação")
     @GetMapping
-@PreAuthorize("hasAnyRole('SERVIDOR', 'CAE')")
-public ResponseEntity<org.springframework.data.domain.Page<AutorizacaoDTO>> filtrar(
-        @RequestParam(required = false) Long alunoId,
-        @RequestParam(required = false) Long ambienteId,
-        @RequestParam(required = false) StatusAutorizacao status,
-        @ParameterObject Pageable pageable) {
+    @PreAuthorize("hasAnyRole('SERVIDOR', 'CAE')")
+    public ResponseEntity<Page<AutorizacaoDTO>> filtrar(
+            @RequestParam(required = false) Long alunoId,
+            @RequestParam(required = false) Long ambienteId,
+            @RequestParam(required = false) StatusAutorizacao status,
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
 
-    org.springframework.data.domain.Page<Autorizacao> page = service.filtrar(alunoId, ambienteId, status, pageable);
-    return ResponseEntity.ok(page.map(mapper::autorizacaoToAutorizacaoDTO));
-}
-
+        Page<Autorizacao> page = service.filtrar(alunoId, ambienteId, status, pageable);
+        return ResponseEntity.ok(page.map(mapper::autorizacaoToAutorizacaoDTO));
+    }
 }
