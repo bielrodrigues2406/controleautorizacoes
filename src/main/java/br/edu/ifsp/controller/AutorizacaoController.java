@@ -1,49 +1,74 @@
 package br.edu.ifsp.controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.edu.ifsp.domain.Autorizacao;
 import br.edu.ifsp.dto.AutorizacaoDTO;
+import br.edu.ifsp.mapper.AutorizacaoMapper;
 import br.edu.ifsp.service.AutorizacaoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
-@RequestMapping("/autorizacoes")
 @RequiredArgsConstructor
+@RequestMapping("/autorizacoes")
 public class AutorizacaoController {
 
     private final AutorizacaoService service;
+    private final AutorizacaoMapper mapper;
 
-    @PostMapping
-    public ResponseEntity<Autorizacao> salvar(@RequestBody @Valid AutorizacaoDTO dto) {
-        return ResponseEntity.ok(service.salvar(dto));
-    }
-
+    @Operation(summary = "Lista todas as autorizações cadastradas")
+    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     @GetMapping
-    public ResponseEntity<List<Autorizacao>> listar() {
-        return ResponseEntity.ok(service.listar());
+    public ResponseEntity<List<AutorizacaoDTO>> listar() {
+        List<Autorizacao> lista = service.listar();
+        return ResponseEntity.ok(mapper.autorizacaoListToAutorizacaoDTOList(lista));
     }
 
+    @Operation(summary = "Cadastra uma nova autorização de uso")
+    @ApiResponse(responseCode = "201", description = "Autorização criada com sucesso")
+    @PostMapping
+    public ResponseEntity<AutorizacaoDTO> salvar(@RequestBody @Valid AutorizacaoDTO dto, UriComponentsBuilder uriBuilder) {
+        Autorizacao autorizacao = service.salvar(dto);
+        URI uri = uriBuilder.path("/autorizacoes/{id}").buildAndExpand(autorizacao.getId()).toUri();
+        return ResponseEntity.created(uri).body(mapper.autorizacaoToAutorizacaoDTO(autorizacao));
+    }
+
+    @Operation(summary = "Lista autorizações de um aluno")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Autorizações do aluno encontradas",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Aluno não possui autorizações", content = @Content)
+    })
     @GetMapping("/aluno/{id}")
-    public ResponseEntity<List<Autorizacao>> listarPorAluno(@PathVariable Long id) {
-        return ResponseEntity.ok(service.listarPorAluno(id));
+    public ResponseEntity<List<AutorizacaoDTO>> listarPorAluno(@PathVariable Long id) {
+        List<Autorizacao> lista = service.listarPorAluno(id);
+        return ResponseEntity.ok(mapper.autorizacaoListToAutorizacaoDTOList(lista));
     }
 
+    @Operation(summary = "Lista autorizações por ambiente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Autorizações do ambiente encontradas",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AutorizacaoDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Ambiente não possui autorizações", content = @Content)
+    })
     @GetMapping("/ambiente/{id}")
-    public ResponseEntity<List<Autorizacao>> listarPorAmbiente(@PathVariable Long id) {
-        return ResponseEntity.ok(service.listarPorAmbiente(id));
+    public ResponseEntity<List<AutorizacaoDTO>> listarPorAmbiente(@PathVariable Long id) {
+        List<Autorizacao> lista = service.listarPorAmbiente(id);
+        return ResponseEntity.ok(mapper.autorizacaoListToAutorizacaoDTOList(lista));
     }
 
+    @Operation(summary = "Remove uma autorização por ID")
+    @ApiResponse(responseCode = "204", description = "Autorização removida com sucesso")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
