@@ -2,12 +2,16 @@ package br.edu.ifsp.service;
 
 import br.edu.ifsp.domain.*;
 import br.edu.ifsp.dto.SolicitacaoChaveDTO;
+import br.edu.ifsp.enums.StatusAutorizacao;
 import br.edu.ifsp.enums.StatusChave;
 import br.edu.ifsp.repository.AlunoRepository;
 import br.edu.ifsp.repository.AmbienteRepository;
 import br.edu.ifsp.repository.SolicitacaoChaveRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springdoc.core.converters.models.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -74,5 +78,10 @@ public class AutorizacaoChaveService {
 
     public List<SolicitacaoChave> listarPorPeriodo(LocalDateTime inicio, LocalDateTime fim) {
         return repository.findByDataSolicitacaoBetween(inicio, fim);
+    }
+
+
+    public Page<Autorizacao> filtrar(Long alunoId, Long ambienteId, StatusAutorizacao status, Pageable pageable) {
+        return repository.filtrarAutorizacoes(alunoId, ambienteId, status, pageable);
     }
 }

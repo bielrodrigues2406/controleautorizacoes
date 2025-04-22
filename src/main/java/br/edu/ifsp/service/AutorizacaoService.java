@@ -2,6 +2,8 @@ package br.edu.ifsp.service;
 
 import java.util.List;
 
+import org.springdoc.core.converters.models.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifsp.domain.Aluno;
@@ -9,6 +11,7 @@ import br.edu.ifsp.domain.Ambiente;
 import br.edu.ifsp.domain.Autorizacao;
 import br.edu.ifsp.domain.Servidor;
 import br.edu.ifsp.dto.AutorizacaoDTO;
+import br.edu.ifsp.enums.StatusAutorizacao;
 import br.edu.ifsp.repository.AlunoRepository;
 import br.edu.ifsp.repository.AmbienteRepository;
 import br.edu.ifsp.repository.AutorizacaoRepository;
@@ -32,9 +35,18 @@ public class AutorizacaoService {
         Ambiente ambiente = ambienteRepository.findById(dto.getAmbienteId())
             .orElseThrow(() -> new RuntimeException("Ambiente não encontrado"));
 
-        Autorizacao autorizacao = new Autorizacao(null, servidor, aluno, ambiente,
-                dto.getAtividade(), dto.getDiaSemana(), dto.getHoraInicio(),
-                dto.getHoraFim(), dto.getDataInicio(), dto.getDataFim());
+          Autorizacao autorizacao = new Autorizacao(null,
+        servidor,
+        aluno,
+        ambiente,
+        dto.getAtividade(),
+        dto.getDiaSemana(),
+        dto.getHoraInicio(),
+        dto.getHoraFim(),
+        dto.getDataInicio(),
+        dto.getDataFim(),
+        StatusAutorizacao.ATIVA
+);
 
         return repository.save(autorizacao);
     }
@@ -57,6 +69,10 @@ public class AutorizacaoService {
 
     public boolean alunoAutorizado(Long alunoId, Long ambienteId) {
         return repository.existeAutorizacaoAtiva(alunoId, ambienteId);
+    }
+
+     public Page<Autorizacao> filtrar(Long alunoId, Long ambienteId, StatusAutorizacao status, Pageable pageable) {
+        return repository.filtrarAutorizacoes(alunoId, ambienteId, status, pageable);
     }
 }
 

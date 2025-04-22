@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import br.edu.ifsp.enums.DiasSemana;
+import br.edu.ifsp.enums.StatusAutorizacao;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,7 +17,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Setter
 @Getter
 @Entity
@@ -24,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Autorizacao {
     @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -38,6 +38,7 @@ public class Autorizacao {
 
     private String atividade; // TCC, Pesquisa, Extensão...
 
+
     @Enumerated(EnumType.STRING)
     private DiasSemana diaSemana;
 
@@ -45,5 +46,7 @@ public class Autorizacao {
     private LocalTime horaFim;
 
     private LocalDate dataInicio;
-    private LocalDate dataFim;
+    private LocalDate dataFim;  
+      @Enumerated(EnumType.STRING)
+    private StatusAutorizacao status;
 }

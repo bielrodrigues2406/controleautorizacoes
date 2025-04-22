@@ -2,6 +2,7 @@ package br.edu.ifsp.controller;
 
 import br.edu.ifsp.domain.Autorizacao;
 import br.edu.ifsp.dto.AutorizacaoDTO;
+import br.edu.ifsp.enums.StatusAutorizacao;
 import br.edu.ifsp.mapper.AutorizacaoMapper;
 import br.edu.ifsp.service.AutorizacaoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.hibernate.query.Page;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springdoc.core.converters.models.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -83,4 +88,17 @@ public class AutorizacaoController {
         boolean autorizado = service.alunoAutorizado(alunoId, ambienteId);
         return ResponseEntity.ok(autorizado);
     }
+
+    @GetMapping
+@PreAuthorize("hasAnyRole('SERVIDOR', 'CAE')")
+public ResponseEntity<org.springframework.data.domain.Page<AutorizacaoDTO>> filtrar(
+        @RequestParam(required = false) Long alunoId,
+        @RequestParam(required = false) Long ambienteId,
+        @RequestParam(required = false) StatusAutorizacao status,
+        @ParameterObject Pageable pageable) {
+
+    org.springframework.data.domain.Page<Autorizacao> page = service.filtrar(alunoId, ambienteId, status, pageable);
+    return ResponseEntity.ok(page.map(mapper::autorizacaoToAutorizacaoDTO));
+}
+
 }
