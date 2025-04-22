@@ -9,12 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServidorDTO {
-    @NotBlank
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
-    @NotBlank
+    @NotBlank(message = "Prontuário é obrigatório")
     private String prontuario;
 
     private String email;
 }
-
