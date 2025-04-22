@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifsp.domain.Servidor;
+import br.edu.ifsp.domain.Usuario;
 import br.edu.ifsp.dto.ServidorDTO;
 import br.edu.ifsp.repository.ServidorRepository;
+import br.edu.ifsp.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -14,9 +16,18 @@ import lombok.RequiredArgsConstructor;
 public class ServidorService {
 
     private final ServidorRepository repository;
+    private final UsuarioRepository usuarioRepository; // ✅ instância correta injetada
 
     public Servidor salvar(ServidorDTO dto) {
-        Servidor servidor = new Servidor(null, dto.getNome(), dto.getProntuario(), dto.getEmail());
+        Usuario usuario = usuarioRepository.findByUsername(dto.getUsuarioUsername())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Servidor servidor = new Servidor(null,
+                dto.getNome(),
+                dto.getProntuario(),
+                dto.getEmail(),
+                usuario);
+
         return repository.save(servidor);
     }
 
@@ -25,7 +36,8 @@ public class ServidorService {
     }
 
     public Servidor buscarPorId(Long id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Servidor não encontrado"));
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Servidor não encontrado"));
     }
 
     public Servidor atualizar(Long id, ServidorDTO dto) {

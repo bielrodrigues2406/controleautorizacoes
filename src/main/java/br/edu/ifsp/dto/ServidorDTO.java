@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServidorDTO {
-    @NotBlank(message = "Nome é obrigatório")
     private String nome;
-
-    @NotBlank(message = "Prontuário é obrigatório")
     private String prontuario;
-
     private String email;
+    private String usuarioUsername; // ou usuarioId
 }
