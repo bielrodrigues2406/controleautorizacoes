@@ -30,6 +30,9 @@ public class Aluno implements Serializable {
 
     @Column(nullable = false)
     private String curso;
+
+    @Column(nullable = false)
+    private String email;
 }
 
     

@@ -17,4 +17,7 @@ public class AlunoDTO {
 
     @NotBlank(message = "Curso é obrigatório")
     private String curso;
+
+    @NotBlank(message = "email é obrigatório")
+    private String emaill;
 }

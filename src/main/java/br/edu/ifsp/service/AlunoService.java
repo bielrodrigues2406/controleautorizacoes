@@ -16,7 +16,7 @@ public class AlunoService {
     private final AlunoRepository repository;
 
     public Aluno salvar(AlunoDTO dto) {
-        Aluno aluno = new Aluno(null, dto.getNome(), dto.getProntuario(), dto.getCurso());
+        Aluno aluno = new Aluno(null, dto.getNome(), dto.getProntuario(), dto.getCurso(),dto.getEmaill());
         return repository.save(aluno);
     }
 

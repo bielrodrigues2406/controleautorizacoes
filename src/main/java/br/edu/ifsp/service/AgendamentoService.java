@@ -1,7 +1,8 @@
-package br.edu.ifsp.service.agendamento;
+package br.edu.ifsp.service;
 
 import br.edu.ifsp.domain.Autorizacao;
 import br.edu.ifsp.repository.AutorizacaoRepository;
+import br.edu.ifsp.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,21 +17,35 @@ import java.util.List;
 public class AgendamentoService {
 
     private final AutorizacaoRepository autorizacaoRepository;
+    private final EmailService emailService;
 
     /**
-     * Verifica todos os dias às 06:00 se há autorizações vencidas
+     * Executa diariamente às 06:00 - Verifica autorizações vencidas e notifica alunos
      */
-    @Scheduled(cron = "0 0 6 * * *") // 06:00 AM todos os dias
+    @Scheduled(cron = "0 0 6 * * *")
     public void verificarAutorizacoesVencidas() {
         LocalDate hoje = LocalDate.now();
 
         List<Autorizacao> vencidas = autorizacaoRepository.findByDataFimBefore(hoje);
+
         if (vencidas.isEmpty()) {
             log.info("[Agendamento] Nenhuma autorização vencida encontrada para {}", hoje);
-        } else {
-            log.warn("[Agendamento] Autorizações vencidas detectadas em {}: {}", hoje, vencidas.size());
-            vencidas.forEach(aut -> log.warn(" - ID: {}, Aluno: {}, Ambiente: {}", aut.getId(),
-                    aut.getAluno().getNome(), aut.getAmbiente().getNome()));
+            return;
+        }
+
+        log.warn("[Agendamento] Autorizações vencidas detectadas em {}: {}", hoje, vencidas.size());
+
+        for (Autorizacao aut : vencidas) {
+            String aluno = aut.getAluno().getNome();
+            String email = aut.getAluno().getEmail();
+            String ambiente = aut.getAmbiente().getNome();
+            String data = aut.getDataFim().toString();
+
+            String assunto = "Sua autorização venceu";
+            String mensagem = String.format("Olá %s,\nsua autorização para o ambiente \"%s\" venceu em %s.\nProcure a CAE para renovar.", aluno, ambiente, data);
+
+            log.warn("Notificando aluno: {} <{}>", aluno, email);
+            emailService.enviar(email, assunto, mensagem);
         }
     }
 }
