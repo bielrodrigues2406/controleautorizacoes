@@ -2,11 +2,13 @@ package br.edu.ifsp.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifsp.domain.Servidor;
 import br.edu.ifsp.domain.Usuario;
 import br.edu.ifsp.dto.ServidorDTO;
+import br.edu.ifsp.enums.Role;
 import br.edu.ifsp.repository.ServidorRepository;
 import br.edu.ifsp.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +17,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ServidorService {
 
-    private final ServidorRepository repository;
-    private final UsuarioRepository usuarioRepository; // ✅ instância correta injetada
+    private final ServidorRepository servidorRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Servidor salvar(ServidorDTO dto) {
-        Usuario usuario = usuarioRepository.findByUsername(dto.getUsuarioUsername())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Usuario usuario = new Usuario();
+        usuario.setUsername(dto.getUsername());
+        usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
+        usuario.setRole(Role.SERVIDOR);
+
+        usuario = usuarioRepository.save(usuario);
 
         Servidor servidor = new Servidor(null,
                 dto.getNome(),
@@ -28,15 +35,15 @@ public class ServidorService {
                 dto.getEmail(),
                 usuario);
 
-        return repository.save(servidor);
+        return servidorRepository.save(servidor);
     }
 
     public List<Servidor> listar() {
-        return repository.findAll();
+        return servidorRepository.findAll();
     }
 
     public Servidor buscarPorId(Long id) {
-        return repository.findById(id)
+        return servidorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Servidor não encontrado"));
     }
 
@@ -44,10 +51,11 @@ public class ServidorService {
         Servidor servidor = buscarPorId(id);
         servidor.setNome(dto.getNome());
         servidor.setEmail(dto.getEmail());
-        return repository.save(servidor);
+        return servidorRepository.save(servidor);
     }
 
     public void deletar(Long id) {
-        repository.deleteById(id);
+        servidorRepository.deleteById(id);
     }
 }
+

@@ -12,5 +12,8 @@ public class ServidorDTO {
     private String nome;
     private String prontuario;
     private String email;
-    private String usuarioUsername; // ou usuarioId
+
+    // Dados de login
+    private String username;
+    private String password;
 }
