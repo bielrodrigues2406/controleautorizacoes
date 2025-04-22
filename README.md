@@ -93,3 +93,13 @@ Facilitar e controlar o uso de salas e laboratórios do campus pelos alunos, com
 
 Documentação da API disponível em:
 
+
+> Inclui teste de endpoints, schemas de requisição e resposta.
+
+---
+
+## 🐳 Execução com Docker
+
+### 🔸 Subir o sistema completo:
+```bash
+docker-compose up --build
