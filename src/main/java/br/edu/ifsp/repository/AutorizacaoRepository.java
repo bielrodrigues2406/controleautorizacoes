@@ -17,6 +17,8 @@ public interface AutorizacaoRepository extends JpaRepository<Autorizacao, Long> 
 
     List<Autorizacao> findByAmbienteId(Long ambienteId);
 
+    long countByDataInicioBetween(LocalDate inicio, LocalDate fim);
+
     List<Autorizacao> findByDataFimBefore(LocalDate data);
 
     @Query("""
