@@ -1,10 +1,8 @@
 package br.edu.ifsp.controller;
 
 import br.edu.ifsp.dto.DashboardDTO;
-import br.edu.ifsp.enums.StatusChave;
 import br.edu.ifsp.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;

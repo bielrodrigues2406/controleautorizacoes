@@ -1,7 +1,6 @@
 package br.edu.ifsp.controller;
 
 import br.edu.ifsp.domain.Usuario;
-import br.edu.ifsp.enums.Role;
 import br.edu.ifsp.repository.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
