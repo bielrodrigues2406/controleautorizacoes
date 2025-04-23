@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifsp.domain.LogAcao;
 import br.edu.ifsp.repository.LogAcaoRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,6 +25,7 @@ public class LogAcaoController {
         return ResponseEntity.ok(repository.findAll());
     }
 
+    @Operation(summary = "Lista os logs de ações do sistema")
     @GetMapping("/usuario/{username}")
     public ResponseEntity<List<LogAcao>> listarPorUsuario(@PathVariable String username) {
         return ResponseEntity.ok(repository.findByUsuario(username));
