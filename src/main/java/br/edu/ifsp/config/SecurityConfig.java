@@ -30,19 +30,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/alunos/**").hasAnyRole("CAE", "SERVIDOR", "ALUNO")
-                .requestMatchers(HttpMethod.POST, "/autorizacoes/**").hasRole("SERVIDOR")
-                .requestMatchers("/solicitacoes/**").hasAnyRole("CAE", "ALUNO")
-                .anyRequest().authenticated()
-            )
-            .formLogin(login -> login
-                .failureHandler(falhaLoginHandler())
-                .successHandler(sucessoLoginHandler())
-            )
-            .httpBasic(); // mantém suporte ao basic auth
+                .csrf().disable()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/recuperar", "/auth/redefinir").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/alunos/**").hasAnyRole("CAE", "SERVIDOR", "ALUNO")
+                        .requestMatchers(HttpMethod.POST, "/autorizacoes/**").hasRole("SERVIDOR")
+                        .requestMatchers("/solicitacoes/**").hasAnyRole("CAE", "ALUNO")
+                        .anyRequest().authenticated())
+                .formLogin(login -> login
+                        .failureHandler(falhaLoginHandler())
+                        .successHandler(sucessoLoginHandler()))
+                .httpBasic(); // mantém suporte ao basic auth
 
         return http.build();
     }
