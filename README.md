@@ -1,142 +1,103 @@
 
-# 🎓 Controle de Autorizações - IFSP
+# 🎓 Sistema de Controle de Autorizações - IFSP
 
-Sistema Web para controle de uso de laboratórios e salas do IFSP, com autenticação, permissões por perfil e funcionalidades automatizadas.
-
----
-
-## 🚀 Funcionalidades
-
-- ✅ Cadastro de Alunos e Servidores com conta de usuário
-- ✅ Controle de autorizações de uso (datas, ambiente, tipo de atividade)
-- ✅ Solicitação, entrega e devolução de chaves (CAE)
-- ✅ Login com Spring Security e autenticação por perfil (`ALUNO`, `SERVIDOR`, `CAE`)
-- ✅ Upload de documentos (PDFs, TCC, autorização)
-- ✅ Logs de auditoria de ações do sistema
-- ✅ Dashboard resumido (autorizados, pendentes, ambientes disponíveis)
-- ✅ Agendamento automático de verificação de autorizações vencidas
-- ✅ Envio de e-mails para notificações
-- ✅ Documentação Swagger disponível em `/swagger-ui.html`
+Projeto acadêmico para gerenciar autorizações de uso de ambientes, controle de chaves e autenticação de perfis no IFSP. Foco em segurança, extensibilidade e base sólida para aplicações escaláveis.
 
 ---
 
-## 👤 Perfis de Acesso
+## ✅ Funcionalidades Principais
 
-| Perfil     | Permissões principais |
-|------------|------------------------|
-| `ALUNO`    | Solicita chave, envia documentos |
-| `SERVIDOR` | Cria autorizações para alunos |
-| `CAE`      | Entrega/devolve chaves, gerencia dados |
+### 👤 Perfis de Usuário (RBAC)
+- **ALUNO**: Solicita uso, devolve chave, envia documentos
+- **SERVIDOR**: Autoriza uso de ambientes
+- **CAE**: Gera chave, confirma devolução, gerencia tudo
+
+### 🔐 Autenticação e Segurança
+- Autenticação com Spring Security (`UserDetailsService`)
+- Criptografia de senhas com BCrypt
+- Controle de tentativas de login com bloqueio automático
+- Recuperação de senha via e-mail com token único
+- Proteção por roles com `@PreAuthorize`
+
+### 🗃️ Gerenciamento
+- CRUD completo de Alunos, Servidores, Ambientes, Autorizações
+- Solicitação, entrega e devolução de chaves (com status)
+- Log de auditoria detalhado (quem fez, quando e o quê)
+
+### 📄 Relatórios e Consultas
+- Exportação em **PDF** e **Excel** das autorizações
+- Filtros por Aluno, Ambiente e Status
+- Paginação e ordenação com `Pageable`
+
+### 📊 Dashboard Analítico
+- Total de autorizações
+- Chaves solicitadas, entregues, pendentes
+- Ambientes disponíveis
 
 ---
 
-## 🔐 Autenticação
+## 🔧 Endpoints de Destaque
 
-- Login via Basic Auth (em `/perfil`, `/solicitacoes`, etc.)
-- Proteção por `@PreAuthorize`
-- Criação de `Usuario` com senha criptografada (BCrypt)
-
----
-
-## 📦 Endpoints principais
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `POST` | `/usuarios` | Cadastra login |
-| `POST` | `/alunos` | Cria aluno com conta |
-| `POST` | `/servidores` | Cria servidor com conta |
-| `POST` | `/autorizacoes` | Cadastra autorização |
-| `POST` | `/solicitacoes` | Aluno solicita uso |
-| `PUT`  | `/solicitacoes/{id}/entregar` | CAE entrega chave |
-| `PUT`  | `/solicitacoes/{id}/devolver` | Aluno devolve chave |
-| `GET`  | `/dashboard` | Resumo geral |
-| `GET`  | `/perfil` | Dados do usuário logado |
+| Método | URI                         | Descrição                                      |
+|--------|-----------------------------|------------------------------------------------|
+| POST   | `/auth/recuperar`           | Gera token de recuperação de senha             |
+| POST   | `/auth/redefinir`           | Redefine senha com token                       |
+| GET    | `/autorizacoes`             | Lista com filtros, paginação                   |
+| GET    | `/autorizacoes/exportar`    | Exporta autorizações para PDF                  |
+| GET    | `/relatorios/exportar/excel`| Exporta autorizações para Excel                |
+| GET    | `/dashboard`                | Dados analíticos em tempo real                 |
 
 ---
 
 ## 🧪 Testes Automatizados
 
-- ✅ `AlunoServiceTest` (JUnit + Mockito)
-- ✅ `AlunoControllerTest` (MockMvc)
-- ✅ Estrutura pronta para cobertura com Jacoco e GitHub Actions
-- 🔜 Testes para `PerfilController` e `ServidorService`
+- Integração completa com `MockMvc` para Auth e Recuperação
+- Testes de serviços com JUnit + Mockito
+- Estrutura pronta para cobertura com Jacoco
+- Planejamento para testes de carga com JMeter e autenticação mockada
 
 ---
 
-## ⚙️ Requisitos
-
-- Java 17
-- Maven 3.8+
-- MySQL 8+
-- IDE com suporte a Spring Boot
-
----
-
-## 🛠️ Como executar o projeto localmente
-
-```bash
-# Clone o repositório
-git clone https://github.com/bielrodrigues2406/controleautorizacoes.git
-cd controleautorizacoes
-
-# Crie o banco de dados MySQL
-CREATE DATABASE controleautorizacoes;
-
-# Configure as credenciais no application.properties
-# src/main/resources/application.properties
-
-# Execute a aplicação
-./mvnw spring-boot:run
-```
-
-Acesse o sistema em:  
-📚 http://localhost:8080/swagger-ui.html
-
----
-
-## 🧪 Testes com VS Code ou Postman
-
-- ✅ Arquivo `testes.http` disponível para testar endpoints com VS Code
-- ✅ Coleção Postman disponível em `/postman_collection.json`
-
----
-
-## 📤 Deploy e CI/CD
-
-- 🔧 Pronto para deploy em:
-  - Render, Railway, Heroku ou VPS com Docker
-- ⚙️ Configuração para GitHub Actions (build + testes)
-- ✅ `Dockerfile` e `docker-compose.yml` incluídos (opcional)
-
----
-
-## 📁 Organização do Projeto
+## 📂 Estrutura do Projeto
 
 ```
 src/
-├── main/
-│   ├── java/br/edu/ifsp/
-│   │   ├── controller/
-│   │   ├── domain/
-│   │   ├── dto/
-│   │   ├── enums/
-│   │   ├── mapper/
-│   │   ├── repository/
-│   │   ├── service/
-│   │   └── service/agendamento/
-│   └── resources/
-│       ├── application.properties
-│       └── data.sql
-└── test/
-    └── java/br/edu/ifsp/
-        ├── service/
-        └── controller/
+├── controller/         # Camada REST
+├── domain/             # Entidades JPA
+├── dto/                # Data Transfer Objects
+├── enums/              # Enumerações (Status, Role)
+├── mapper/             # MapStruct (Entity <-> DTO)
+├── repository/         # Interfaces JPA
+├── service/            # Regras de negócio
+├── config/             # Segurança, beans, handlers
+└── resources/
+    ├── application.properties
+    └── data.sql
 ```
 
 ---
 
-## 👨‍💻 Autor
+## 🐳 Infraestrutura (planejado)
+
+- `Dockerfile` e `docker-compose.yml` com MySQL + App
+- Deploy possível em Render, Railway, VPS ou AWS EC2
+- CI/CD com GitHub Actions (build, teste, cobertura)
+
+---
+
+## 🧠 Futuro / Extensões
+
+- Integração com JWT para APIs externas
+- Serviço de email real com SendGrid/Mailgun
+- Balanceamento com NGINX + Spring Gateway
+- Cache de consultas com Redis
+- Exportação para CSV / gráficos dinâmicos
+
+---
+
+## 👨‍💻 Autores
 
 **Gabriel Rodrigues**  
-Estudante de Ciência da Computação — IFSP Presidente Epitácio  
-Projeto desenvolvido como prática de Engenharia de Software, Segurança, Arquitetura e Testes.
+**Jorge Luis**  
+Alunos de Ciência da Computação - IFSP Presidente Epitácio  
+Projeto voltado à prática de Engenharia de Software, Arquitetura e Segurança.
