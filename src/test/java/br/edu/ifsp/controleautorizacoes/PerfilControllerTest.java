@@ -27,7 +27,6 @@ public class PerfilControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
     private UsuarioRepository usuarioRepository;
 
     @Test

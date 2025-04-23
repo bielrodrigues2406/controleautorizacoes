@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.User;
 
 import org.springframework.stereotype.Service;
 
-import br.edu.ifsp.domain.Usuario;
 import br.edu.ifsp.repository.UsuarioRepository;
 import br.edu.ifsp.service.TentativaLoginService;
 import lombok.RequiredArgsConstructor;

@@ -2,8 +2,6 @@ package br.edu.ifsp.service;
 
 import java.util.List;
 
-import org.hibernate.query.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -72,7 +70,7 @@ public class AutorizacaoService {
         return repository.existeAutorizacaoAtiva(alunoId, ambienteId);
     }
 
-     public Page<Autorizacao> filtrar(Long alunoId, Long ambienteId, StatusAutorizacao status, Pageable pageable) {
+     public org.springframework.data.domain.Page<Autorizacao> filtrar(Long alunoId, Long ambienteId, StatusAutorizacao status, Pageable pageable) {
         return repository.filtrarAutorizacoes(alunoId, ambienteId, status, pageable);
     }
 }
