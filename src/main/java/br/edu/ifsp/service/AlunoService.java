@@ -1,25 +1,29 @@
 package br.edu.ifsp.service;
 
-import java.util.List;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import br.edu.ifsp.domain.Aluno;
 import br.edu.ifsp.domain.Usuario;
 import br.edu.ifsp.dto.AlunoDTO;
 import br.edu.ifsp.enums.Role;
 import br.edu.ifsp.repository.AlunoRepository;
 import br.edu.ifsp.repository.UsuarioRepository;
+import br.edu.ifsp.service.shared.CrudService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AlunoService {
+public class AlunoService extends CrudService<Aluno, Long> {
 
     private final AlunoRepository repository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Override
+    protected JpaRepository<Aluno, Long> getRepository() {
+        return repository;
+    }
 
     public Aluno salvar(AlunoDTO dto) {
         Usuario usuario = new Usuario();
@@ -39,24 +43,11 @@ public class AlunoService {
         return repository.save(aluno);
     }
 
-    public List<Aluno> listar() {
-        return repository.findAll();
-    }
-
-    public Aluno buscarPorId(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
-    }
-
     public Aluno atualizar(Long id, AlunoDTO dto) {
-        Aluno aluno = buscarPorId(id);
+        Aluno aluno = buscarPorId(id); 
         aluno.setNome(dto.getNome());
         aluno.setCurso(dto.getCurso());
         aluno.setEmail(dto.getEmail());
         return repository.save(aluno);
-    }
-
-    public void deletar(Long id) {
-        repository.deleteById(id);
     }
 }
