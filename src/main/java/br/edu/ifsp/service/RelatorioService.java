@@ -4,14 +4,24 @@ import br.edu.ifsp.domain.Autorizacao;
 import br.edu.ifsp.enums.StatusAutorizacao;
 import br.edu.ifsp.repository.AutorizacaoRepository;
 import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.apache.poi.sl.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.apache.poi.ss.usermodel.*; // ✅ CORRETO (SS = Spreadsheet)
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Cell;
 
 import java.io.OutputStream;
 import java.time.format.DateTimeFormatter;
@@ -77,4 +87,41 @@ public class RelatorioService {
         cell.setPadding(5);
         table.addCell(cell);
     }
+
+    public void gerarAutorizacoesExcel(OutputStream out, Long alunoId, Long ambienteId, StatusAutorizacao status) {
+    try (Workbook workbook = new XSSFWorkbook()) {
+        org.apache.poi.ss.usermodel.Sheet sheet = workbook.createSheet("Autorizações");
+        Row header = sheet.createRow(0);
+
+        String[] colunas = {"ID", "Aluno", "Ambiente", "Status", "Início", "Fim"};
+        for (int i = 0; i < colunas.length; i++) {
+            header.createCell(i).setCellValue(colunas[i]);
+        }
+
+        List<Autorizacao> lista = autorizacaoRepository
+                .filtrarAutorizacoes(alunoId, ambienteId, status, PageRequest.of(0, Integer.MAX_VALUE))
+                .getContent();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        int linha = 1;
+        for (Autorizacao aut : lista) {
+            Row row = sheet.createRow(linha++);
+            row.createCell(0).setCellValue(aut.getId());
+            row.createCell(1).setCellValue(aut.getAluno().getNome());
+            row.createCell(2).setCellValue(aut.getAmbiente().getNome());
+            row.createCell(3).setCellValue(aut.getStatus().name());
+            row.createCell(4).setCellValue(aut.getDataInicio().format(formatter));
+            row.createCell(5).setCellValue(aut.getDataFim().format(formatter));
+        }
+
+        for (int i = 0; i < colunas.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        workbook.write(out);
+    } catch (Exception e) {
+        throw new RuntimeException("Erro ao gerar Excel", e);
+    }
+}
+
 }

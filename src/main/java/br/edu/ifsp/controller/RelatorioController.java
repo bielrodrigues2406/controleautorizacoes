@@ -28,4 +28,18 @@ public class RelatorioController {
 
         relatorioService.gerarAutorizacoesPdf(response.getOutputStream(), alunoId, ambienteId, status);
     }
+
+    @GetMapping("/exportar/excel")
+@PreAuthorize("hasAnyRole('SERVIDOR', 'CAE')")
+public void exportarExcel(@RequestParam(required = false) Long alunoId,
+                          @RequestParam(required = false) Long ambienteId,
+                          @RequestParam(required = false) StatusAutorizacao status,
+                          HttpServletResponse response) throws IOException {
+
+    response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    response.setHeader("Content-Disposition", "attachment; filename=autorizacoes.xlsx");
+
+    relatorioService.gerarAutorizacoesExcel(response.getOutputStream(), alunoId, ambienteId, status);
+}
+
 }
