@@ -23,7 +23,6 @@ public class PerfilController {
     
 @Operation(summary = "Retorna os dados do usuário autenticado")
 @PreAuthorize("isAuthenticated()")
-@GetMapping
 @ApiResponse(
     responseCode = "200",
     description = "Perfil retornado com sucesso",

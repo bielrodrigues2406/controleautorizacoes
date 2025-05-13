@@ -1,9 +1,11 @@
-package br.edu.ifsp.service;
+package br.edu.ifsp.controleautorizacoes;
 
-import br.edu.ifsp.domain.TokenRecuperacao;
 import br.edu.ifsp.domain.Usuario;
 import br.edu.ifsp.repository.TokenRecuperacaoRepository;
 import br.edu.ifsp.repository.UsuarioRepository;
+import br.edu.ifsp.service.EmailService;
+import br.edu.ifsp.service.RecuperacaoSenhaService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;

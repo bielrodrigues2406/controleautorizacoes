@@ -26,7 +26,7 @@ public class DashboardService {
         long chavesEntregues = solicitacaoRepo.countByStatusAndDataEntregaBetween(
                 StatusChave.ENTREGUE, inicio.atStartOfDay(), fim.atTime(23, 59));
 
-        long devolucoesPendentes = solicitacaoRepo.countByStatusAndDataDevolucaoIsNull();
+        long devolucoesPendentes = solicitacaoRepo.countByStatusAndDataDevolucaoIsNull(status.RESERVADA);
 
         long ambientesDisponiveis = ambienteRepo.countByDisponivelTrue();
 

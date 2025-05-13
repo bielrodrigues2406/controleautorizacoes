@@ -37,5 +37,7 @@ public class Usuario {
 
     @OneToOne(mappedBy = "usuario")
     private Servidor servidor;
+
+    
 }
 

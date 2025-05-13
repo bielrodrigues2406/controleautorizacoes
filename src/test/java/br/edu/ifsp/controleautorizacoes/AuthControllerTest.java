@@ -5,13 +5,11 @@ import br.edu.ifsp.domain.Usuario;
 import br.edu.ifsp.enums.Role;
 import br.edu.ifsp.repository.TokenRecuperacaoRepository;
 import br.edu.ifsp.repository.UsuarioRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,8 +27,6 @@ public class AuthControllerTest {
     @Autowired private UsuarioRepository usuarioRepo;
     @Autowired private TokenRecuperacaoRepository tokenRepo;
     @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private ObjectMapper objectMapper;
-
     private final String email = "teste@ifsp.br";
     private final String senhaOriginal = "senhaAntiga";
 
@@ -79,4 +75,41 @@ public class AuthControllerTest {
                 .param("novaSenha", "qualquer123"))
                 .andExpect(status().isInternalServerError());
     }
+
+    @Test
+public void loginBemSucedido() throws Exception {
+    String body = String.format("{\"username\": \"%s\", \"password\": \"%s\"}", email, senhaOriginal);
+
+    mockMvc.perform(post("/auth/login")
+            .contentType("application/json")
+            .content(body))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status").value("ok"))
+            .andExpect(jsonPath("$.tipo").value("ALUNO"));
+}
+
+@Test
+public void loginComSenhaIncorreta() throws Exception {
+    String body = String.format("{\"username\": \"%s\", \"password\": \"errada123\"}", email);
+
+    mockMvc.perform(post("/auth/login")
+            .contentType("application/json")
+            .content(body))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value("erro"))
+            .andExpect(jsonPath("$.message").value("Senha inválida"));
+}
+
+@Test
+public void loginUsuarioInexistente() throws Exception {
+    String body = "{\"username\": \"inexistente@ifsp\", \"password\": \"123\"}";
+
+    mockMvc.perform(post("/auth/login")
+            .contentType("application/json")
+            .content(body))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status").value("erro"))
+            .andExpect(jsonPath("$.message").value("Usuário não encontrado"));
+}
+
 }

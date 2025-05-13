@@ -1,4 +1,4 @@
-package br.edu.ifsp.service;
+package br.edu.ifsp.service.audit;
 
 import java.time.LocalDateTime;
 

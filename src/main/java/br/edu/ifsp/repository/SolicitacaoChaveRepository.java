@@ -19,7 +19,7 @@ public interface SolicitacaoChaveRepository extends JpaRepository<SolicitacaoCha
 
     long countByStatusAndDataEntregaBetween(StatusChave status, LocalDateTime inicio, LocalDateTime fim);
 
-    long countByStatusAndDataDevolucaoIsNull();
+    long countByStatusAndDataDevolucaoIsNull(StatusChave status);
 
     List<SolicitacaoChave> findByDataSolicitacaoBetween(LocalDateTime inicio, LocalDateTime fim);
     long countByStatus(StatusChave status);
